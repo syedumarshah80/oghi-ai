@@ -1,1 +1,141 @@
 
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Explore 50 useful AI tools for writing, study, images, video, audio and productivity.">
+<title>Oghi AI — 50 Useful AI Tools</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2d;--panel2:#18233b;--text:#eef3ff;--muted:#a9b6d0;--accent:#7c9cff;--line:#263451}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#0b1020,#10182a);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{padding:38px 18px 26px;text-align:center;background:radial-gradient(ellipse at top,#243b70 0%,#111a30 55%,transparent 100%)}
+header h1{font-size:clamp(30px,7vw,48px);margin:0 0 10px}
+header p{color:var(--muted);margin:0 auto 22px;max-width:650px;line-height:1.6}
+.wrap{max-width:1100px;margin:auto;padding:0 16px 44px}
+.search{width:100%;padding:15px 17px;border:1px solid var(--line);border-radius:13px;background:#0d1527;color:var(--text);font-size:16px;outline:none}
+.search:focus{border-color:var(--accent)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 22px}
+.filter{border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:9px 13px;border-radius:999px;cursor:pointer}
+.filter.active,.filter:hover{background:#294477;color:white;border-color:#5478c5}
+.count{color:var(--muted);font-size:14px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px}
+.card{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:15px;padding:16px;min-height:154px;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.logo{width:38px;height:38px;border-radius:11px;background:#263b68;display:grid;place-items:center;font-weight:700;color:#dce6ff;font-size:15px;flex:none}
+.card h2{font-size:17px;margin:0}
+.category{font-size:11px;color:#a9c0ff;background:#24365b;padding:4px 8px;border-radius:20px;display:inline-block;margin:0 0 8px;width:max-content}
+.card p{font-size:13px;color:var(--muted);line-height:1.45;margin:0 0 14px;flex:1}
+.card a{display:block;text-decoration:none;text-align:center;background:#355ba5;color:white;padding:10px;border-radius:9px;font-weight:700;font-size:13px}
+.card a:hover{background:#4b73c3}
+.empty{display:none;text-align:center;color:var(--muted);padding:35px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:22px;border-top:1px solid var(--line)}
+footer a{color:#a9c0ff}
+@media(max-width:480px){header{padding-top:28px}.grid{grid-template-columns:1fr 1fr;gap:9px}.card{padding:12px;min-height:175px}.card h2{font-size:15px}.card p{font-size:12px}.logo{width:32px;height:32px}}
+@media(max-width:340px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Oghi AI</h1>
+  <p>Discover 50 useful AI tools for everyday work, learning, creativity and business.</p>
+  <div class="wrap"><input id="search" class="search" type="search" placeholder="Search AI tools..." aria-label="Search AI tools"></div>
+</header>
+<main class="wrap">
+  <nav class="filters" id="filters" aria-label="Filter tools"></nav>
+  <p class="count" id="count">Showing 50 tools</p>
+  <section class="grid" id="grid" aria-label="AI tools directory"></section>
+  <p class="empty" id="empty">No tools found. Try another search.</p>
+</main>
+<footer>Oghi AI · A directory of useful AI tools. Tool names and services belong to their respective owners. Some tools may require an account or payment.</footer>
+<script>
+const tools = [
+["ChatGPT","Chat & Assistant","AI assistant for writing, questions, ideas and everyday tasks.","https://chatgpt.com","C"],
+["Google Gemini","Chat & Assistant","Google's AI assistant for questions, writing and research.","https://gemini.google.com","G"],
+["Claude","Chat & Assistant","AI assistant useful for writing, reasoning and long documents.","https://claude.ai","Cl"],
+["Microsoft Copilot","Chat & Assistant","AI assistant for answers, drafting and productivity.","https://copilot.microsoft.com","Co"],
+["Perplexity","Chat & Assistant","AI search and answers with source links.","https://www.perplexity.ai","P"],
+["Grok","Chat & Assistant","AI assistant from xAI for questions and creative tasks.","https://grok.com","Gr"],
+["Meta AI","Chat & Assistant","AI assistant from Meta for chat and creative help.","https://www.meta.ai","M"],
+["DeepSeek","Chat & Assistant","AI chat assistant for reasoning, writing and coding.","https://www.deepseek.com","D"],
+["Poe","Chat & Assistant","Explore and chat with different AI bots in one place.","https://poe.com","Po"],
+["Character.AI","Chat & Assistant","Chat with AI characters and create your own bots.","https://character.ai","Ch"],
+["Grammarly","Writing & Study","Writing assistant for grammar, clarity and tone.","https://www.grammarly.com","Gr"],
+["QuillBot","Writing & Study","Paraphrase, summarize and improve written text.","https://quillbot.com","Q"],
+["Notion AI","Writing & Study","AI help for notes, documents and workspace tasks.","https://www.notion.so/product/ai","N"],
+["Copy.ai","Writing & Study","AI-assisted marketing copy and business content.","https://www.copy.ai","C"],
+["Jasper","Writing & Study","AI content platform for marketing teams and brands.","https://www.jasper.ai","J"],
+["DeepL","Writing & Study","AI translation and writing assistance.","https://www.deepl.com","D"],
+["NotebookLM","Writing & Study","Ask questions about your own sources and notes.","https://notebooklm.google.com","N"],
+["Google Translate","Writing & Study","Translate words, text and webpages between languages.","https://translate.google.com","T"],
+["Canva","Images & Design","Design posts, presentations and graphics with AI features.","https://www.canva.com","Ca"],
+["Midjourney","Images & Design","Create artistic images from text prompts.","https://www.midjourney.com","Mj"],
+["Adobe Firefly","Images & Design","Generate and edit images with Adobe's AI tools.","https://firefly.adobe.com","Af"],
+["Ideogram","Images & Design","Generate images, including designs with readable text.","https://ideogram.ai","I"],
+["Leonardo AI","Images & Design","Create images and visual assets using AI.","https://leonardo.ai","L"],
+["Recraft","Images & Design","Create illustrations, icons and design assets.","https://www.recraft.ai","R"],
+["Remove.bg","Images & Design","Remove image backgrounds automatically.","https://www.remove.bg","Rb"],
+["PhotoRoom","Images & Design","Make product photos and remove backgrounds.","https://www.photoroom.com","Ph"],
+["Runway","Video","AI tools for generating and editing videos.","https://runwayml.com","R"],
+["Kling AI","Video","Generate video clips from text and images.","https://klingai.com","K"],
+["Pika","Video","Create and transform short videos with AI.","https://pika.art","Pi"],
+["Luma Dream Machine","Video","Generate video from text and images.","https://lumalabs.ai/dream-machine","Lu"],
+["HeyGen","Video","Create AI avatar videos and translated videos.","https://www.heygen.com","H"],
+["Synthesia","Video","Create presenter-style videos with AI avatars.","https://www.synthesia.io","S"],
+["InVideo AI","Video","Turn prompts and scripts into videos.","https://invideo.io","Iv"],
+["CapCut","Video","Video editor with captions and AI editing features.","https://www.capcut.com","Cc"],
+["ElevenLabs","Audio","AI voices, text-to-speech and voice tools.","https://elevenlabs.io","E"],
+["Suno","Audio","Generate songs and music from text prompts.","https://suno.com","Su"],
+["Udio","Audio","Create music using generative AI.","https://www.udio.com","U"],
+["Adobe Podcast","Audio","Enhance speech and improve spoken-audio quality.","https://podcast.adobe.com","Ap"],
+["Otter.ai","Audio","Transcribe meetings and create summaries.","https://otter.ai","O"],
+["Descript","Audio","Edit audio and video using text-based tools.","https://www.descript.com","De"],
+["Gamma","Productivity & Coding","Create presentations and documents with AI.","https://gamma.app","Ga"],
+["Napkin AI","Productivity & Coding","Turn written ideas into diagrams and visuals.","https://www.napkin.ai","Na"],
+["Otter AI Chat","Productivity & Coding","Ask questions about meeting notes and conversations.","https://otter.ai","O"],
+["Krisp","Productivity & Coding","Remove background noise from calls and recordings.","https://krisp.ai","K"],
+["Cursor","Productivity & Coding","AI-powered code editor for software development.","https://cursor.com","Cu"],
+["Replit","Productivity & Coding","Build and run apps with an online coding workspace.","https://replit.com","Re"],
+["Lovable","Productivity & Coding","Build web apps by describing what you want.","https://lovable.dev","Lo"],
+["v0","Productivity & Coding","Generate user interfaces and web app code with AI.","https://v0.dev","v0"],
+["Perplexity Labs","Productivity & Coding","Research and create reports, files and interactive outputs.","https://www.perplexity.ai","Pl"],
+["Google AI Studio","Productivity & Coding","Experiment with Google's generative AI models.","https://aistudio.google.com","Gs"]
+];
+const categories=["All","Chat & Assistant","Writing & Study","Images & Design","Video","Audio","Productivity & Coding"];
+let selected="All";
+const grid=document.getElementById("grid"), search=document.getElementById("search"), filters=document.getElementById("filters");
+function renderFilters(){
+ filters.innerHTML="";
+ categories.forEach(cat=>{
+  const b=document.createElement("button"); b.className="filter"+(selected===cat?" active":""); b.textContent=cat;
+  b.onclick=()=>{selected=cat;renderFilters();renderTools()}; filters.appendChild(b);
+ });
+}
+function renderTools(){
+ const q=search.value.trim().toLowerCase(); grid.innerHTML="";
+ const shown=tools.filter(t=>(selected==="All"||t[1]===selected)&&t.slice(0,3).join(" ").toLowerCase().includes(q));
+ shown.forEach(t=>{
+  const card=document.createElement("article");card.className="card";
+  const top=document.createElement("div");top.className="top";
+  const logo=document.createElement("div");logo.className="logo";logo.textContent=t[4];
+  const title=document.createElement("h2");title.textContent=t[0];top.append(logo,title);
+  const cat=document.createElement("span");cat.className="category";cat.textContent=t[1];
+  const desc=document.createElement("p");desc.textContent=t[2];
+  const link=document.createElement("a");link.href=t[3];link.target="_blank";link.rel="noopener noreferrer";link.textContent="Visit website ↗";
+  card.append(top,cat,desc,link);grid.appendChild(card);
+ });
+ document.getElementById("count").textContent=`Showing ${shown.length} of ${tools.length} tools`;
+ document.getElementById("empty").style.display=shown.length?"none":"block";
+}
+search.addEventListener("input",renderTools);
+renderFilters();renderTools();
+</script>
+</body>
+</html>'''
+
+path = Path("/mnt/data/index.html")
+path.write_text(html, encoding="utf-8")
+print(f"Created {path} ({len(html):,} characters)")
